@@ -20,5 +20,5 @@ BookDisableNavigation = true
 [menu]
 [[menu.after]]
 name = "Instagram"
-url = "https://instagram.com/yourusername"
+url = "https://www.instagram.com/clarerdonegan/"
 weight = 10
