@@ -1,0 +1,11 @@
+# Cloudflare Pages Build Configuration
+# This file is optional but helps ensure consistent builds
+
+build:
+  command: hugo --minify
+  output_directory: public
+  
+# Environment variables
+environment:
+  HUGO_VERSION: "0.154.1"
+  NODE_VERSION: "20"
