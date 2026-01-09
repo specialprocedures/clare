@@ -1,8 +1,6 @@
 ---
-menu:
-  main:
-    weight: 2
-title: Images
+title: Works
+weight: 2
 # bookFlatSection: true
 bookCollapseSection: true
 ---
