@@ -1,6 +1,6 @@
 {{- $dir := .Get 0 | default "images" -}}
-{{- $columns := .Get 1 | default "3" -}}
-{{- $width := .Get 2 | default "85" -}}
+{{- $columns := .Get 1 | default "2" -}}
+{{- $width := .Get 2 | default "100" -}}
 {{- $galleryId := printf "gallery-%s" ($dir | replaceRE "[^a-zA-Z0-9]+" "-") -}}
 
 <!-- Load lightGallery assets once -->
@@ -49,28 +49,9 @@
 </div>
 
 <style>
-  .gallery- {
-      {
-      $galleryId
-    }
-  }
-
-    {
-    column-count: {
-        {
-        $columns
-      }
-    }
-
-    ;
-
-    max-width: {
-        {
-        $width
-      }
-    }
-
-    %;
+  .gallery-{{ $galleryId }} {
+    column-count: {{ $columns }};
+    max-width: {{ $width }}%;
   }
 </style>
 
