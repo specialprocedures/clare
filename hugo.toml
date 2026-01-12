@@ -16,6 +16,8 @@ BookSearch = false
 BookSection = "docs"
 # Disable page navigation buttons
 BookDisableNavigation = true
+# Favicon
+BookFavicon = "favicon.png"
 
 # Hugo Book theme menus
 [menu]
