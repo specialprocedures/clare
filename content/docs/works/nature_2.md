@@ -12,4 +12,4 @@ BookToC: false
 
 # Wild Soft
 
-{{< gallery "images/nature_2" "2" >}}
+{{< grid dir="images/nature_2" aspect="original" >}}

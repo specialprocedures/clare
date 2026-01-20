@@ -1,6 +1,4 @@
 {{- $dir := .Get "dir" | default (.Get 0) | default "images" -}}
-{{- $columns := .Get "columns" | default (.Get 1) | default "3" -}}
-{{- $spanFirst := .Get "spanFirst" | default "false" -}}
 {{- $galleryId := printf "gallery-%s" ($dir | replaceRE "[^a-zA-Z0-9]+" "-") -}}
 
 <div class="gallery-wrapper-{{ $galleryId }}">
@@ -11,29 +9,80 @@
     {{- $images = $images | append . -}}
     {{- end -}}
     {{- end -}}
-
     {{- range $index, $image := $images -}}
-    <div class="gallery-item{{ if and (eq $spanFirst "true") (eq $index 0) }} gallery-item-span{{ end }}">
-      <img src="/{{ $dir }}/{{ $image.Name }}" alt="Gallery image {{ $index }}" loading="lazy">
+    {{- $imgPath := printf "/%s/%s" $dir $image.Name -}}
+    <div class="gallery-item">
+      <img src="{{ $imgPath }}" alt="Gallery image {{ $index }}" loading="lazy" data-gallery-id="{{ $galleryId }}">
     </div>
     {{- end -}}
   </div>
 </div>
 
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const gallery = document.querySelector('.gallery-{{ $galleryId }}');
+    const images = gallery.querySelectorAll('img[data-gallery-id="{{ $galleryId }}"]');
+    let loadedCount = 0;
+    
+    images.forEach(img => {
+      if (img.complete) {
+        checkAndLayout();
+      } else {
+        img.addEventListener('load', checkAndLayout);
+      }
+    });
+    
+    function checkAndLayout() {
+      loadedCount++;
+      if (loadedCount === images.length) {
+        layoutGallery();
+      }
+    }
+    
+    function layoutGallery() {
+      const items = Array.from(gallery.querySelectorAll('.gallery-item'));
+      const classified = items.map((item, index) => {
+        const img = item.querySelector('img');
+        const aspectRatio = img.naturalWidth / img.naturalHeight;
+        const isPortrait = aspectRatio < 1;
+        item.classList.add(isPortrait ? 'portrait' : 'landscape');
+        return { item, isPortrait, index };
+      });
+      
+      // Count consecutive portraits
+      let i = 0;
+      while (i < classified.length) {
+        if (classified[i].isPortrait) {
+          let portraitCount = 0;
+          let j = i;
+          while (j < classified.length && classified[j].isPortrait) {
+            portraitCount++;
+            j++;
+          }
+          
+          // If odd number of portraits and there are at least 2 landscapes following
+          if (portraitCount % 2 === 1 && j < classified.length - 1 && 
+              !classified[j].isPortrait && j + 1 < classified.length && !classified[j + 1].isPortrait) {
+            // Mark the last portrait as paired with landscapes
+            classified[i + portraitCount - 1].item.classList.add('portrait-with-landscapes');
+            classified[j].item.classList.add('landscape-paired');
+            classified[j + 1].item.classList.add('landscape-paired');
+            i = j + 2;
+          } else {
+            i = j;
+          }
+        } else {
+          i++;
+        }
+      }
+    }
+  });
+</script>
+
 <style>
   .gallery-{{ $galleryId }} {
     display: grid;
-    {{- if eq (int $columns) 1 }}
-    grid-template-columns: 1fr;
-    {{- else if eq (int $columns) 2 }}
     grid-template-columns: repeat(2, 1fr);
-    {{- else if eq (int $columns) 3 }}
-    grid-template-columns: repeat(3, 1fr);
-    {{- else if eq (int $columns) 4 }}
-    grid-template-columns: repeat(4, 1fr);
-    {{- else }}
-    grid-template-columns: repeat(3, 1fr);
-    {{- end }}
     gap: 1rem;
     width: 100%;
     margin: 0;
@@ -53,28 +102,41 @@
     margin-left: auto;
   }
   
-  /* Span first image across all columns */
-  .gallery-{{ $galleryId }} .gallery-item-span {
+  /* Landscape images span full width */
+  .gallery-{{ $galleryId }} .gallery-item.landscape {
     grid-column: 1 / -1;
   }
   
-  /* Tablet: reduce to 2 columns if more than 2 */
-  @media (max-width: 768px) {
-    .gallery-{{ $galleryId }} {
-      {{- if gt (int $columns) 2 }}
-      grid-template-columns: repeat(2, 1fr);
-      {{- else if eq (int $columns) 2 }}
-      grid-template-columns: repeat(2, 1fr);
-      {{- else }}
-      grid-template-columns: 1fr;
-      {{- end }}
-    }
+  .gallery-{{ $galleryId }} .gallery-item.landscape img {
+    width: 100%;
+  }
+  
+  /* Portrait paired with landscapes */
+  .gallery-{{ $galleryId }} .gallery-item.portrait-with-landscapes {
+    grid-column: 1;
+    grid-row: span 2;
+  }
+  
+  /* Paired landscapes take right column */
+  .gallery-{{ $galleryId }} .gallery-item.landscape-paired {
+    grid-column: 2;
+    grid-row: span 1;
+  }
+  
+  .gallery-{{ $galleryId }} .gallery-item.landscape-paired img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
   
   /* Mobile: single column */
-  @media (max-width: 480px) {
+  @media (max-width: 768px) {
     .gallery-{{ $galleryId }} {
       grid-template-columns: 1fr;
+    }
+    
+    .gallery-{{ $galleryId }} .gallery-item.landscape {
+      grid-column: 1;
     }
   }
 </style>

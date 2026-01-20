@@ -11,8 +11,8 @@ BookToC: false
 ---
 ## Köln
 
-{{< gallery "images/portraits/koln" 1 100>}}
+{{< gallery "images/portraits/koln" >}}
 
 ## Los Angeles
 
-{{< gallery "images/portraits/la" 1 100>}}
+{{< gallery "images/portraits/la" >}}

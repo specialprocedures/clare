@@ -10,4 +10,4 @@ BookToC: false
 
 ---
 
-{{< gallery "images/movement/breakdance" 1>}}
+{{< gallery "images/movement/breakdance" >}}

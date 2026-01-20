@@ -9,4 +9,4 @@ weight: 4
 BookToC: false
 
 ---
-{{< gallery "images/movement/contemporary" 1>}}
+{{< gallery "images/movement/contemporary" >}}
